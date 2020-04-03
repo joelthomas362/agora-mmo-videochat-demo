@@ -63,7 +63,11 @@ public class PartyJoiner : MonoBehaviour
     {
         if(remotePlayerID != -1)
         {
+            //print("attempting to access remotePlayerID: " + remotePlayerID);
             photonView.RPC("InvitePlayerToPartyChannel", PhotonPlayer.Find(remotePlayerID), GetComponent<AgoraVideoChat>().GetRemoteChannel());
+
+            photonView.RPC("InvitePlayerToPartyChannel", PhotonTargets.All, GetComponent<AgoraVideoChat>().GetRemoteChannel());
+            print("trying to access " + PhotonPlayer.Find(remotePlayerID).ToStringFull());
 
         }
     }

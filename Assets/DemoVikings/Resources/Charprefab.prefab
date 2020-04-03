@@ -193,8 +193,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 11400010}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 0
-  instantiationId: -1
+  viewIdField: 2
+  instantiationId: 2
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!114 &11400010
@@ -271,8 +271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localGameObjects:
   - {fileID: 4024445271744060198}
-  localComponents:
-  - {fileID: 114431670257695358}
+  localComponents: []
 --- !u!1 &100008
 GameObject:
   m_ObjectHideFlags: 0
@@ -1458,8 +1457,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 0
-  instantiationId: -1
+  viewIdField: 3
+  instantiationId: 3
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!1 &4024445271744060198
