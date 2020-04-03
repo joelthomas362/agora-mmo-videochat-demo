@@ -53,9 +53,6 @@ public class PartyJoiner : MonoBehaviour
             print("I've been invited to join channel: " + remoteInviteChannelName);
         }
 
-        
-        
-
         EnableJoinButton();
     }
 
@@ -64,17 +61,38 @@ public class PartyJoiner : MonoBehaviour
         joinButton.SetActive(true);
     }
 
+    public void AllTest()
+    {
+        print("AllTest() " + gameObject.name);
+    }
+
+    public void OtherTest()
+    {
+        print("OtherTest() " + gameObject.name);
+    }
+
+    public void TargetPlayer(string nickName)
+    {
+        print("MyPlayer: " + gameObject.name + "OtherPlayer: " + nickName);
+    }
+
     // this button press will always be local because the remote clients canvases are disabled
     public void OnInviteButtonPress()
     {
         if(remotePlayerID != -1)
         {
             //print("attempting to access remotePlayerID: " + remotePlayerID);
-            photonView.RPC("InvitePlayerToPartyChannel", PhotonPlayer.Find(remotePlayerID), GetComponent<AgoraVideoChat>().GetRemoteChannel());
+            //photonView.RPC("InvitePlayerToPartyChannel", PhotonPlayer.Find(remotePlayerID), GetComponent<AgoraVideoChat>().GetRemoteChannel());
+
+            photonView.RPC("Alltest", PhotonTargets.All);
+            photonView.RPC("OtherTest", PhotonTargets.Others);
+            photonView.RPC("TargetPlayer", PhotonPlayer.Find(remotePlayerID), PhotonPlayer.Find(remotePlayerID).NickName);
+            
+
 
             //photonView.RPC("InvitePlayerToPartyChannel", PhotonTargets.All, GetComponent<AgoraVideoChat>().GetRemoteChannel());
             
-            print("trying to access " + PhotonPlayer.Find(remotePlayerID).ToStringFull());
+            //print("trying to access " + PhotonPlayer.Find(remotePlayerID).ToStringFull());
 
         }
     }
