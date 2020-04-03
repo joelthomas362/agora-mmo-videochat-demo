@@ -45,15 +45,16 @@ public class PartyJoiner : MonoBehaviour
     [PunRPC]
     public void InvitePlayerToPartyChannel(string channelName)
     {
+        print(gameObject.name);
         remoteInviteChannelName = channelName;
         joinButton.SetActive(true);
         print("I've been invited to join channel: " + remoteInviteChannelName);
+
+        EnableJoinButton();
     }
 
-    [PunRPC]
-    public void JoinTest()
+    public void EnableJoinButton()
     {
-        print(gameObject.name + " join tessssst");
         joinButton.SetActive(true);
     }
 
@@ -63,9 +64,8 @@ public class PartyJoiner : MonoBehaviour
         if(remotePlayerID != -1)
         {
             photonView.RPC("InvitePlayerToPartyChannel", PhotonPlayer.Find(remotePlayerID), GetComponent<AgoraVideoChat>().GetRemoteChannel());
-        }
 
-        photonView.RPC("JoinTest", PhotonTargets.Others);
+        }
     }
 
     public void OnJoinButtonPress()
