@@ -61,16 +61,19 @@ public class PartyJoiner : MonoBehaviour
         joinButton.SetActive(true);
     }
 
+    [PunRPC]
     public void AllTest()
     {
         print("AllTest() " + gameObject.name);
     }
 
+    [PunRPC]
     public void OtherTest()
     {
         print("OtherTest() " + gameObject.name);
     }
 
+    [PunRPC]
     public void TargetPlayer(string nickName)
     {
         print("MyPlayer: " + gameObject.name + "OtherPlayer: " + nickName);
