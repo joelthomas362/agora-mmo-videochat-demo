@@ -87,7 +87,7 @@ public class PartyJoiner : MonoBehaviour
             //print("attempting to access remotePlayerID: " + remotePlayerID);
             //photonView.RPC("InvitePlayerToPartyChannel", PhotonPlayer.Find(remotePlayerID), GetComponent<AgoraVideoChat>().GetRemoteChannel());
 
-            photonView.RPC("Alltest", PhotonTargets.All);
+            photonView.RPC("AllTest", PhotonTargets.All);
             photonView.RPC("OtherTest", PhotonTargets.Others);
             photonView.RPC("TargetPlayer", PhotonPlayer.Find(remotePlayerID), PhotonPlayer.Find(remotePlayerID).NickName);
             
