@@ -36,4 +36,7 @@ MonoBehaviour:
   - JoinButtonTest
   - ButtonScript
   - JoinTest
+  - OtherTest
+  - TargetPlayer
+  - WithDrawInvite
   DisableAutoOpenWizard: 1

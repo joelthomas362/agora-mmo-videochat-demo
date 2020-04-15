@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Realtime;
+using Photon;
 
 
-public class PartyJoiner : MonoBehaviour
+
+public class PartyJoiner : Photon.MonoBehaviour
 {
 
     private PhotonView photonView;
@@ -21,16 +24,17 @@ public class PartyJoiner : MonoBehaviour
     private GameObject joinButton;
     [SerializeField]
     private int remotePlayerID;
-    [SerializeField]
-    private int remoteButtonID;
 
     [SerializeField]
     private string remoteInviteChannelName;
+
+    private int myID;
 
     // Start is called before the first frame update
     void Start()
     {
         photonView = GetComponent<PhotonView>();
+        myID = photonView.ownerId;
 
         if(!photonView.isMine)
         {
@@ -43,61 +47,19 @@ public class PartyJoiner : MonoBehaviour
     }
 
     [PunRPC]
-    public void InvitePlayerToPartyChannel(string channelName)
+    public void InvitePlayerToPartyChannel(int invitedID)
     {
-        if(photonView.isMine)
+        // display a little ball  over their head
+        if(invitedID == photonView.viewID && photonView.isMine)
         {
-            print(gameObject.name);
-            remoteInviteChannelName = channelName;
-            joinButton.SetActive(true);
-            print("I've been invited to join channel: " + remoteInviteChannelName);
+            print("THATS ME!");
         }
-
-        EnableJoinButton();
-    }
-
-    public void EnableJoinButton()
-    {
-        joinButton.SetActive(true);
     }
 
     [PunRPC]
-    public void AllTest()
+    public void WithDrawInvite()
     {
-        print("AllTest() " + gameObject.name);
-    }
 
-    [PunRPC]
-    public void OtherTest()
-    {
-        print("OtherTest() " + gameObject.name);
-    }
-
-    [PunRPC]
-    public void TargetPlayer(string nickName)
-    {
-        print("MyPlayer: " + gameObject.name + "OtherPlayer: " + nickName);
-    }
-
-    // this button press will always be local because the remote clients canvases are disabled
-    public void OnInviteButtonPress()
-    {
-        if(remotePlayerID != -1)
-        {
-            //print("attempting to access remotePlayerID: " + remotePlayerID);
-            //photonView.RPC("InvitePlayerToPartyChannel", PhotonPlayer.Find(remotePlayerID), GetComponent<AgoraVideoChat>().GetRemoteChannel());
-
-            photonView.RPC("AllTest", PhotonTargets.All);
-            photonView.RPC("OtherTest", PhotonTargets.Others);
-            photonView.RPC("TargetPlayer", PhotonPlayer.Find(remotePlayerID), PhotonPlayer.Find(remotePlayerID).NickName);
-            
-
-
-            //photonView.RPC("InvitePlayerToPartyChannel", PhotonTargets.All, GetComponent<AgoraVideoChat>().GetRemoteChannel());
-            
-            //print("trying to access " + PhotonPlayer.Find(remotePlayerID).ToStringFull());
-
-        }
     }
 
     public void OnJoinButtonPress()
@@ -117,11 +79,13 @@ public class PartyJoiner : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
-            //print("I bumped into: " + other.name);   
-            remotePlayerID = PhotonView.Get(other.gameObject).ownerId;
-            remoteButtonID = PhotonView.Get(other.transform.GetChild(0).GetChild(1)).ownerId;
+            PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
+            if(otherPlayerPhotonView == null)
+            {
+                return;
+            }
 
-            inviteButton.interactable = true;
+            PhotonView.Find(otherPlayerPhotonView.viewID).RPC("InvitePlayerToPartyChannel", PhotonTargets.All, otherPlayerPhotonView.viewID);
         }
     }
 
