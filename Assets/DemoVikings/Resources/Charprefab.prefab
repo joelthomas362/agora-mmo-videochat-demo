@@ -193,8 +193,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 11400010}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 0
-  instantiationId: -1
+  viewIdField: 2
+  instantiationId: 2
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!114 &11400010
@@ -241,8 +241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inviteButton: {fileID: 4454070465173561753}
   joinButton: {fileID: 2079266011865034306}
-  remotePlayerID: 0
-  remoteButtonID: 0
+  remotePlayerViewID: 0
   remoteInviteChannelName: 
 --- !u!135 &135247917694409704
 SphereCollider:
@@ -1307,7 +1306,6 @@ GameObject:
   - component: {fileID: 8638554548306038551}
   - component: {fileID: 1423695336562907454}
   - component: {fileID: 8200248810429918849}
-  - component: {fileID: 7870874423827874557}
   - component: {fileID: 5618319819093686921}
   m_Layer: 0
   m_Name: JoinButton
@@ -1422,18 +1420,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &7870874423827874557
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2079266011865034306}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e462f97c22a0843d2827ee5ca8b220bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5618319819093686921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1457,8 +1443,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 0
-  instantiationId: -1
+  viewIdField: 3
+  instantiationId: 3
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!1 &4024445271744060198

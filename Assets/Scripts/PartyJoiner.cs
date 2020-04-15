@@ -9,98 +9,104 @@ using Photon;
 
 public class PartyJoiner : Photon.MonoBehaviour
 {
-
-    private PhotonView photonView;
-    // when the invite is made, send them your channelName
-    // when two players separate, nullify/disable everything
-    // when the other player presses join, have them join the special channel
-
-    //[SerializeField]
-    //private Canvas playerCanvas;
-
+    [Header("Local Player Stats")]
     [SerializeField]
     private Button inviteButton;
     [SerializeField]
     private GameObject joinButton;
-    [SerializeField]
-    private int remotePlayerID;
 
+    [Header("Remote Player Stats")]
+    [SerializeField]
+    private int remotePlayerViewID;
     [SerializeField]
     private string remoteInviteChannelName;
 
-    private int myID;
+    private AgoraVideoChat agoraVideo;
 
-    // Start is called before the first frame update
+    private void Awake()
+    {
+        agoraVideo = GetComponent<AgoraVideoChat>();
+    }
+
     void Start()
     {
-        photonView = GetComponent<PhotonView>();
-        myID = photonView.ownerId;
-
         if(!photonView.isMine)
         {
             transform.GetChild(0).gameObject.SetActive(false);
         }
 
         inviteButton.interactable = false;
-        joinButton.gameObject.SetActive(false);
-        //joinButton.interactable = false;
+        joinButton.SetActive(false);
     }
 
-    [PunRPC]
-    public void InvitePlayerToPartyChannel(int invitedID)
-    {
-        // display a little ball  over their head
-        if(invitedID == photonView.viewID && photonView.isMine)
-        {
-            print("THATS ME!");
-        }
-    }
-
-    [PunRPC]
-    public void WithDrawInvite()
-    {
-
-    }
-
-    public void OnJoinButtonPress()
-    {
-        print("I'm going to join players channel: " + remoteInviteChannelName);
-        GetComponent<AgoraVideoChat>().JoinRemoteChannel(remoteInviteChannelName);
-    }
-
-    // this scripts fire everywhere
-    // each of these objects are now essentially in the scene, and you have to sort them out as such.
     private void OnTriggerEnter(Collider other)
     {
-        if (!photonView.isMine)
+        if (!photonView.isMine || !other.CompareTag("Player"))
         {
             return;
         }
 
-        if (other.CompareTag("Player"))
+        PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
+        if(otherPlayerPhotonView == null)
         {
-            PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
-            if(otherPlayerPhotonView == null)
-            {
-                return;
-            }
-
-            PhotonView.Find(otherPlayerPhotonView.viewID).RPC("InvitePlayerToPartyChannel", PhotonTargets.All, otherPlayerPhotonView.viewID);
+            return;
         }
+
+        remotePlayerViewID = otherPlayerPhotonView.viewID;
+        inviteButton.interactable = true;
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if(!photonView.isMine)
+        if(!photonView.isMine || !other.CompareTag("Player"))
         {
             return;
         }
 
-        if(other.CompareTag("Player"))
-        {
-            remotePlayerID = -1;    
+       // PhotonView.Find(remotePlayerViewID).RPC("WithdrawInvite", PhotonTargets.All, remotePlayerViewID);
 
-            inviteButton.interactable = false;
+        remotePlayerViewID = -1;    
+
+        inviteButton.interactable = false;
+    }
+
+    public void OnInviteButtonPress()
+    {
+        PhotonView.Find(remotePlayerViewID).RPC("InvitePlayerToPartyChannel", PhotonTargets.All, remotePlayerViewID, agoraVideo.GetLocalChannel());
+    }
+
+    public void OnJoinButtonPress()
+    {
+        if (remotePlayerViewID != -1)
+        {
+            if(photonView.isMine)
+            {
+                print("my id: " + photonView.viewID + " my channel: " + agoraVideo.GetLocalChannel() + " joining channel: " + remoteInviteChannelName);
+            }
+            int success = agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
+            print("join success: " + success);
+        }
+
+        
+    }
+
+    [PunRPC]
+    public void InvitePlayerToPartyChannel(int invitedID, string channelName)
+    {
+        // display a little ball  over their head
+        if (invitedID == photonView.viewID && photonView.isMine)
+        {
+            joinButton.SetActive(true);
+            remoteInviteChannelName = channelName;
+        }
+    }
+
+    [PunRPC]
+    public void WithdrawInvite(int canceledID)
+    {
+        if(canceledID == photonView.viewID && photonView.isMine)
+        {
+            joinButton.SetActive(false);
         }
     }
 }

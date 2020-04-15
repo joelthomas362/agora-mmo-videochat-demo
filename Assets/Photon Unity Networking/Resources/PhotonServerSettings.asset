@@ -39,4 +39,5 @@ MonoBehaviour:
   - OtherTest
   - TargetPlayer
   - WithDrawInvite
+  - WithdrawInvite
   DisableAutoOpenWizard: 1
