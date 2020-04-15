@@ -23,11 +23,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     public Vector3 videoFramePosition;
     public float newVideoFrameOffsetAmount = 140;
 
-    private PhotonView pView;
-
     void Start()
     {
-        pView = GetComponent<PhotonView>();
+        if (!photonView.isMine)
+            return;
 
         if(mRtcEngine != null)
         {
@@ -54,6 +53,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     public int JoinRemoteChannel(string remoteChannelName)
     {
+        if (!photonView.isMine)
+            return -1;
+
         int joinSuccess = mRtcEngine.JoinChannel(remoteChannelName, null, myUID);
 
         if(joinSuccess == 0)
@@ -72,20 +74,32 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     // local client joins
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
+        if (!photonView.isMine)
+            return;
+
         print("local user joined - channel: " + channelName + " - uid: " + uid + " - elapsed: " + elapsed);
         myUID = uid;
 
         CreateUserVideoSurface(uid, videoFramePosition + (Vector3.right * currentUsers), true);
 
-        print("userCount: " + currentUsers);
+        //print("userCount: " + currentUsers);
     }
 
     // remote client joins
     void OnUserJoinedHandler(uint uid, int elapsed)
     {
+        if (!photonView.isMine)
+            return;
+
         print("remote user joined - uid: " + uid + " - elapsed: " + elapsed);
 
-        CreateUserVideoSurface(uid, videoFramePosition + (Vector3.right * currentUsers), false);
+        VideoSurface surface = CreateUserVideoSurface(uid, videoFramePosition + (Vector3.right * currentUsers), false);
+
+
+        if (surface == null)
+            print("no surface");
+        else
+            print("surface was created");
 
         print("userCount: " + currentUsers);
     }
@@ -93,16 +107,22 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     // user leaves
     void OnLeaveChannelHandler(RtcStats stats)
     {
+        if (!photonView.isMine)
+            return;
+
         print("User left");
-        currentUsers--;
+        //currentUsers--;
     }
 
     // when remote user leaves the channel
     void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
+        if (!photonView.isMine)
+            return;
+
         print("remote user offline - uid: " + uid + " - reason: " + reason);
 
-        currentUsers--;
+        //currentUsers--;
         print("userCount: " + currentUsers);
 
         Destroy(GameObject.Find(uid.ToString()));
@@ -110,17 +130,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     VideoSurface CreateUserVideoSurface(uint uid, Vector3 spawnPosition, bool isLocalUser)
     {
-        if (!pView.isMine)
-        {
-            //print("Photon view isn't mine: " + gameObject.name);
-            return null;
-        }
-            
 
         GameObject newUserVideo = new GameObject(uid.ToString(), typeof(RawImage), typeof(VideoSurface));
         if(newUserVideo == null)
         {
-            //print("new user video <GAMEOBJECT> couldn't be created: " + gameObject.name);
+            print("VideoSurface() - new user video <GAMEOBJECT> couldn't be created: " + gameObject.name);
             return null;
         }
 
@@ -133,7 +147,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         VideoSurface newVideoSurface = newUserVideo.GetComponent<VideoSurface>();
         if (newVideoSurface == null)
         {
-            print("new user video <VIDEOSURFACE> couldn't be created: " + gameObject.name);
+            print("VideoSurface() - new user video <VIDEOSURFACE> couldn't be created: " + gameObject.name);
             return null;
         }
 
@@ -153,7 +167,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        currentUsers--;
+        //currentUsers--;
         if(mRtcEngine != null)
         {
             mRtcEngine.LeaveChannel();
