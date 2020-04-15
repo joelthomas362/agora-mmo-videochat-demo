@@ -23,6 +23,8 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     private AgoraVideoChat agoraVideo;
 
+    public string newChannel;
+
     private void Awake()
     {
         agoraVideo = GetComponent<AgoraVideoChat>();
@@ -81,13 +83,18 @@ public class PartyJoiner : Photon.MonoBehaviour
         {
             if(photonView.isMine)
             {
-                print("my id: " + photonView.viewID + " my channel: " + agoraVideo.GetLocalChannel() + " joining channel: " + remoteInviteChannelName);
+                //print("my id: " + photonView.viewID + " my channel: " + agoraVideo.GetLocalChannel() + " joining channel: " + remoteInviteChannelName);
+                agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
             }
-            int success = agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
-            print("join success: " + success);
         }
+    }
 
-        
+    public void OnChannelButtonPress()
+    {
+        if(photonView.isMine)
+        {
+            agoraVideo.JoinRemoteChannel(newChannel);
+        }
     }
 
     [PunRPC]

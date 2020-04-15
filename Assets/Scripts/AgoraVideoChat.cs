@@ -12,6 +12,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     private string appID = "57481146914f4cddaa220d6f7a045063";
     [SerializeField]
     private string channel = "unity3d";
+    private string originalChannel;
     private IRtcEngine mRtcEngine;
 
     [Header("Misc.")]
@@ -33,6 +34,8 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             IRtcEngine.Destroy();
         }
 
+        originalChannel = channel;
+
         mRtcEngine = IRtcEngine.GetEngine(appID);
 
         mRtcEngine.OnJoinChannelSuccess = OnJoinChannelSuccessHandler;
@@ -51,24 +54,18 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         return channel;
     }
 
-    public int JoinRemoteChannel(string remoteChannelName)
+    public void JoinRemoteChannel(string remoteChannelName)
     {
         if (!photonView.isMine)
-            return -1;
+            return;
 
-        int joinSuccess = mRtcEngine.JoinChannel(remoteChannelName, null, myUID);
+        mRtcEngine.LeaveChannel();
 
-        if(joinSuccess == 0)
-        {
-            print("successful join");
-            channel = remoteChannelName;
-        }
-        else
-        {
-            print("Join UNSUCCESSFUL");
-        }
+        mRtcEngine.JoinChannel(remoteChannelName, null, myUID);
+        mRtcEngine.EnableVideo();
+        mRtcEngine.EnableVideoObserver();
 
-        return joinSuccess;
+        channel = remoteChannelName;
     }
 
     // local client joins
@@ -77,7 +74,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        print("local user joined - channel: " + channelName + " - uid: " + uid + " - elapsed: " + elapsed);
+        //print("local user joined - channel: " + channelName + " - uid: " + uid + " - elapsed: " + elapsed);
         myUID = uid;
 
         CreateUserVideoSurface(uid, videoFramePosition + (Vector3.right * currentUsers), true);
@@ -91,17 +88,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        print("remote user joined - uid: " + uid + " - elapsed: " + elapsed);
+        //print("remote user joined - uid: " + uid + " - elapsed: " + elapsed);
 
         VideoSurface surface = CreateUserVideoSurface(uid, videoFramePosition + (Vector3.right * currentUsers), false);
 
-
-        if (surface == null)
-            print("no surface");
-        else
-            print("surface was created");
-
-        print("userCount: " + currentUsers);
+        //print("userCount: " + currentUsers);
     }
 
     // user leaves
@@ -110,8 +101,8 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        print("User left");
-        //currentUsers--;
+        //print("User left");
+        currentUsers--;
     }
 
     // when remote user leaves the channel
@@ -120,10 +111,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        print("remote user offline - uid: " + uid + " - reason: " + reason);
+        //print("remote user offline - uid: " + uid + " - reason: " + reason);
 
-        //currentUsers--;
-        print("userCount: " + currentUsers);
+        currentUsers--;
+        //print("userCount: " + currentUsers);
 
         Destroy(GameObject.Find(uid.ToString()));
     }
@@ -147,7 +138,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         VideoSurface newVideoSurface = newUserVideo.GetComponent<VideoSurface>();
         if (newVideoSurface == null)
         {
-            print("VideoSurface() - new user video <VIDEOSURFACE> couldn't be created: " + gameObject.name);
+            //print("VideoSurface() - new user video <VIDEOSURFACE> couldn't be created: " + gameObject.name);
             return null;
         }
 
@@ -156,7 +147,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             newVideoSurface.SetForUser(uid);
         }
 
-        print(gameObject.name + " creating new video surface for: " + uid);
+        //print(gameObject.name + " creating new video surface for: " + uid);
 
         newVideoSurface.SetGameFps(30);
 
@@ -167,13 +158,12 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        //currentUsers--;
+        currentUsers--;
         if(mRtcEngine != null)
         {
             mRtcEngine.LeaveChannel();
             mRtcEngine = null;
             IRtcEngine.Destroy();
-            
         }
     }
 }
