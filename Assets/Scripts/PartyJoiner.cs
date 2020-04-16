@@ -8,6 +8,8 @@ public class PartyJoiner : Photon.MonoBehaviour
     private Button inviteButton;
     [SerializeField]
     private GameObject joinButton;
+    [SerializeField]
+    private GameObject leaveButton;
 
     [Header("Remote Player Stats")]
     [SerializeField]
@@ -31,6 +33,7 @@ public class PartyJoiner : Photon.MonoBehaviour
 
         inviteButton.interactable = false;
         joinButton.SetActive(false);
+        leaveButton.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -57,11 +60,10 @@ public class PartyJoiner : Photon.MonoBehaviour
             return;
         }
 
-       // PhotonView.Find(remotePlayerViewID).RPC("WithdrawInvite", PhotonTargets.All, remotePlayerViewID);
-
         remotePlayerViewID = -1;    
 
         inviteButton.interactable = false;
+        joinButton.SetActive(false);
     }
 
     public void OnInviteButtonPress()
@@ -71,20 +73,23 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void OnJoinButtonPress()
     {
-        if (remotePlayerViewID != -1)
+        if (remotePlayerViewID != -1 && photonView.isMine)
         {
-            if(photonView.isMine)
-            {
-                //print("my id: " + photonView.viewID + " my channel: " + agoraVideo.GetLocalChannel() + " joining channel: " + remoteInviteChannelName);
-                agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
-            }
+            agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
+            joinButton.SetActive(false);
+            leaveButton.SetActive(true);
         }
+    }
+
+    public void OnLeaveButtonPress()
+    {
+        agoraVideo.JoinOriginalChannel();
+        leaveButton.SetActive(false);
     }
 
     [PunRPC]
     public void InvitePlayerToPartyChannel(int invitedID, string channelName)
     {
-        // display a little ball  over their head
         if (invitedID == photonView.viewID && photonView.isMine)
         {
             joinButton.SetActive(true);

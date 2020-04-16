@@ -56,25 +56,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         mRtcEngine.JoinChannel(channel, null, 0);
     }
 
-
-    uint test;
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.F))
-        {
-            CreateUserVideoSurface((uint)currentUserCount + 1, false);
-        }
-
-        if(Input.GetKeyDown(KeyCode.G))
-        {
-            RemoveUserVideoSurface(test);
-        }
-    }
-
-    public string GetLocalChannel()
-    {
-        return channel;
-    }
+    public string GetLocalChannel() => channel;
 
     public void JoinRemoteChannel(string remoteChannelName)
     {
@@ -90,6 +72,19 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         channel = remoteChannelName;
     }
 
+    public void JoinOriginalChannel()
+    {
+        if (!photonView.isMine)
+            return;
+
+        mRtcEngine.LeaveChannel();
+        mRtcEngine.JoinChannel(originalChannel, null, myUID);
+        mRtcEngine.EnableVideo();
+        mRtcEngine.EnableVideoObserver();
+        channel = originalChannel;
+    }
+
+    #region Agora Callbacks
     // Local Client Joins Channel.
     void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
@@ -127,6 +122,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         RemoveUserVideoSurface(uid);
     }
+    #endregion
 
     // Create new image plane to display users in party
     void CreateUserVideoSurface(uint uid, bool isLocalUser)
