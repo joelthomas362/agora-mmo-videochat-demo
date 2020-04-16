@@ -1,11 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using Photon.Realtime;
-using Photon;
-
-
 
 public class PartyJoiner : Photon.MonoBehaviour
 {
@@ -22,8 +16,6 @@ public class PartyJoiner : Photon.MonoBehaviour
     private string remoteInviteChannelName;
 
     private AgoraVideoChat agoraVideo;
-
-    public string newChannel;
 
     private void Awake()
     {
@@ -86,14 +78,6 @@ public class PartyJoiner : Photon.MonoBehaviour
                 //print("my id: " + photonView.viewID + " my channel: " + agoraVideo.GetLocalChannel() + " joining channel: " + remoteInviteChannelName);
                 agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
             }
-        }
-    }
-
-    public void OnChannelButtonPress()
-    {
-        if(photonView.isMine)
-        {
-            agoraVideo.JoinRemoteChannel(newChannel);
         }
     }
 
