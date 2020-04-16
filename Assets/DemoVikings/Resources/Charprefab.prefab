@@ -231,7 +231,6 @@ MonoBehaviour:
   content: {fileID: 8176406759717611961}
   spaceBetweenUserVideos: 150
   playerVideoList: []
-  debugPlayerToDelete: 0
 --- !u!114 &114431670257695358
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -56,6 +56,8 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         mRtcEngine.JoinChannel(channel, null, 0);
     }
 
+
+    uint test;
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.F))
@@ -65,7 +67,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.G))
         {
-            RemoveUserVideoSurface((uint)currentUserCount);
+            RemoveUserVideoSurface(test);
         }
     }
 
@@ -177,13 +179,16 @@ public class AgoraVideoChat : Photon.MonoBehaviour
                 playerVideoList.Remove(player);
                 // delete it
                 Destroy(player.gameObject);
+                break;
             }
         }
 
         // update positions of new players
         for (int i = 0; i < playerVideoList.Count; i++)
         {
+            print(i + " old position: " + playerVideoList[i].GetComponent<RectTransform>().anchoredPosition);
             playerVideoList[i].GetComponent<RectTransform>().anchoredPosition = Vector2.down * 150 * i;
+            print(i + " new position: " + playerVideoList[i].GetComponent<RectTransform>().anchoredPosition);
         }
 
         Vector2 oldContent = content.sizeDelta;
