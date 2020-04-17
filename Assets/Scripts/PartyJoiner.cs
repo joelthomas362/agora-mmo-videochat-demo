@@ -93,8 +93,11 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void OnLeaveButtonPress()
     {
-        agoraVideo.JoinOriginalChannel();
-        leaveButton.SetActive(false);
+        if(photonView.isMine)
+        {
+            agoraVideo.JoinOriginalChannel();
+            leaveButton.SetActive(false);
+        }
     }
 
     public void EnableLeaveButton()
