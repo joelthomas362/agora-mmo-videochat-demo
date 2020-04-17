@@ -245,7 +245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inviteButton: {fileID: 4454070465173561753}
   joinButton: {fileID: 2079266011865034306}
-  leaveButton: {fileID: 0}
+  leaveButton: {fileID: 9087070787081116495}
   remotePlayerViewID: 0
   remoteInviteChannelName: 
 --- !u!135 &135247917694409704
