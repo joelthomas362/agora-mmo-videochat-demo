@@ -182,9 +182,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         currentUserCount++;
 
         UpdatePlayerVideoPostions();
-        if (playerVideoList.Count <= 1)
+        if (playerVideoList.Count > 1)
         {
-            PlayerChatIsEmpty();
+            PlayerChatIsPopulated();
         }
     }
 
