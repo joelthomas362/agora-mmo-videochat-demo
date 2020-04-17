@@ -192,6 +192,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         {
             PlayerChatIsPopulated();
         }
+        else
+        {
+            PlayerChatIsEmpty();
+        }
     }
 
     private void RemoveUserVideoSurface(uint deletedUID)
