@@ -45,7 +45,7 @@ public class PartyJoiner : Photon.MonoBehaviour
     private void OnDisable()
     {
         AgoraVideoChat.PlayerChatIsEmpty -= DisableLeaveButton;
-        AgoraVideoChat.PlayerChatIsPopulated -= DisableLeaveButton;
+        AgoraVideoChat.PlayerChatIsPopulated -= EnableLeaveButton;
     }
 
     private void OnTriggerEnter(Collider other)
