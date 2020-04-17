@@ -43,22 +43,12 @@ public class PartyJoiner : Photon.MonoBehaviour
             return;
         }
 
-        // Used to join other players Agora video chat.
-        AgoraVideoChat otherPlayerAgora = other.GetComponent<AgoraVideoChat>();
-        if(otherPlayerAgora)
-        {
-            if(agoraVideo.GetLocalChannel() != otherPlayerAgora.GetLocalChannel())
-            {
-                remoteInviteChannelName = otherPlayerAgora.GetLocalChannel();
-                inviteButton.interactable = true;
-            }
-        }
-
         // Used for calling RPC events on other players.
         PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
         if (otherPlayerPhotonView != null)
         {
             remotePlayerViewID = otherPlayerPhotonView.viewID;
+            inviteButton.interactable = true;
         }
     }
 
