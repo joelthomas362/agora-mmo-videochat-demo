@@ -127,7 +127,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         if (playerVideoList.Count <= 1)
         {
-            //PlayerChatIsEmpty();
+            PlayerChatIsEmpty();
         }
 
         currentUserCount--;
@@ -141,7 +141,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         if (playerVideoList.Count <= 1)
         {
-            //PlayerChatIsEmpty();
+            PlayerChatIsEmpty();
         }
 
         RemoveUserVideoSurface(uid);
