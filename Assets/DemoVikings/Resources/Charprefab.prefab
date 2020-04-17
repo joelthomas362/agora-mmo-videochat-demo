@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   appID: 57481146914f4cddaa220d6f7a045063
-  channel: unity3dd
+  channel: unity3dz
   userVideoPrefab: {fileID: 1272405541118282648, guid: 9c09429efb77d4336ab9650b8f03362e,
     type: 3}
   spawnPoint: {fileID: 8601549185160302039}
