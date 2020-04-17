@@ -82,6 +82,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             Destroy(playerVideoList[i]);
             playerVideoList.RemoveAt(i);
         }
+        currentUserCount = 0;
 
         JoinRemoteChannel(originalChannel);
     }
