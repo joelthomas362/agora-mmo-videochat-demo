@@ -4,21 +4,18 @@ using agora_gaming_rtc;
 
 public class AgoraVideoChat : Photon.MonoBehaviour
 {
+    [Header("Agora Properties")]
     [SerializeField]
     private string appID = "57481146914f4cddaa220d6f7a045063";
     [SerializeField]
     private string channel = "unity3d";
     private string originalChannel;
     private IRtcEngine mRtcEngine;
-
-    [Header("Misc.")]
-    [SerializeField]
     private uint myUID = 0;
-    [SerializeField]
     private int currentUserCount = 0;
 
 
-    [Header("Player Video Panel")]
+    [Header("Player Video Panel Properties")]
     [SerializeField]
     public GameObject userVideoPrefab;
     [SerializeField]
@@ -27,9 +24,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     private RectTransform content;
     [SerializeField]
     private float spaceBetweenUserVideos = 150f;
-
-    [Space]
     public List<GameObject> playerVideoList;
+
+    public delegate void AgoraCustomEvent();
+    public static event AgoraCustomEvent PlayerChatIsEmpty;
+    public static event AgoraCustomEvent PlayerChatIsPopulated;
 
     void Start()
     {
@@ -57,7 +56,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         mRtcEngine.JoinChannel(channel, null, 0);
     }
 
-    public string GetLocalChannel() => channel;
+    public string GetCurrentChannel() => channel;
+
+
 
     /// <summary>
     /// Join the Agora video chat channel of another player.
@@ -85,77 +86,81 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        foreach (GameObject player in playerVideoList)
-        {
-            Destroy(player.gameObject);
-        }
-        playerVideoList.Clear();
         currentUserCount = 0;
-
         JoinRemoteChannel(originalChannel);
     }
 
     #region Agora Callbacks
     // Local Client Joins Channel.
-    void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
+    private void OnJoinChannelSuccessHandler(string channelName, uint uid, int elapsed)
     {
         if (!photonView.isMine)
             return;
 
         myUID = uid;
 
-
         CreateUserVideoSurface(uid, true);
-        print("Local join success");
     }
 
     // Remote Client Joins Channel.
-    void OnUserJoinedHandler(uint uid, int elapsed)
+    private void OnUserJoinedHandler(uint uid, int elapsed)
     {
         if (!photonView.isMine)
             return;
 
         CreateUserVideoSurface(uid, false);
-        GetComponent<PartyJoiner>().EnableLeaveButton();
-        print("Remote join success");
+        PlayerChatIsPopulated();
     }
 
-    // User Leaves Channel.
-    void OnLeaveChannelHandler(RtcStats stats)
+    // Local user leaves channel.
+    private void OnLeaveChannelHandler(RtcStats stats)
     {
         if (!photonView.isMine)
             return;
+
+        foreach (GameObject player in playerVideoList)
+        {
+            Destroy(player.gameObject);
+        }
+        playerVideoList.Clear();
+
+        PlayerChatIsEmpty();
 
         currentUserCount--;
     }
 
     // Remote User Leaves the Channel.
-    void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
+    private void OnUserOfflineHandler(uint uid, USER_OFFLINE_REASON reason)
     {
         if (!photonView.isMine)
             return;
+
+        if(playerVideoList.Count <= 1)
+        {
+            PlayerChatIsEmpty();
+        }
 
         RemoveUserVideoSurface(uid);
     }
     #endregion
 
     // Create new image plane to display users in party
-    void CreateUserVideoSurface(uint uid, bool isLocalUser)
+    private void CreateUserVideoSurface(uint uid, bool isLocalUser)
     {
-        // Get the next position for newly created VideoSurface
-        float spawnY = currentUserCount * spaceBetweenUserVideos;
-        Vector3 spawnPosition = new Vector3(0, -spawnY, 0);
-
+        // Avoid duplicating Local player video screen
         for (int i = 0; i < playerVideoList.Count; i++)
         {
-            if(playerVideoList[i].name == uid.ToString())
+            if (playerVideoList[i].name == uid.ToString())
             {
-                print("Found duplicate UID: " + uid.ToString());
                 return;
             }
         }
 
-        // Create Gameobject holding video surface
+        // Get the next position for newly created VideoSurface
+        float spawnY = currentUserCount * spaceBetweenUserVideos;
+        Vector3 spawnPosition = new Vector3(0, -spawnY, 0);
+
+        // Create Gameobject holding video surface and update properties
         GameObject newUserVideo = Instantiate(userVideoPrefab, spawnPosition, spawnPoint.rotation);
         if (newUserVideo == null)
         {
@@ -165,6 +170,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         newUserVideo.name = uid.ToString();
         newUserVideo.transform.SetParent(spawnPoint, false);
         newUserVideo.transform.rotation = Quaternion.Euler(Vector3.right * -180);
+
         playerVideoList.Add(newUserVideo);
 
         // Update our VideoSurface to reflect new users
@@ -173,6 +179,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         {
             Debug.LogError("CreateUserVideoSurface() - VideoSurface component is null on newly joined user");
         }
+
         if (isLocalUser == false)
         {
             newVideoSurface.SetForUser(uid);
@@ -187,7 +194,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         UpdatePlayerVideoPostions();
     }
 
-    void RemoveUserVideoSurface(uint deletedUID)
+    private void RemoveUserVideoSurface(uint deletedUID)
     {
         currentUserCount--;
 
@@ -215,9 +222,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     {
         for (int i = 0; i < playerVideoList.Count; i++)
         {
-            print(i + " old position: " + playerVideoList[i].GetComponent<RectTransform>().anchoredPosition);
             playerVideoList[i].GetComponent<RectTransform>().anchoredPosition = Vector2.down * 150 * i;
-            print(i + " new position: " + playerVideoList[i].GetComponent<RectTransform>().anchoredPosition);
         }
     }
 

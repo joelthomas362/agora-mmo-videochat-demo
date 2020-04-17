@@ -24,7 +24,7 @@ public class PartyJoiner : Photon.MonoBehaviour
         agoraVideo = GetComponent<AgoraVideoChat>();
     }
 
-    void Start()
+    private void Start()
     {
         if(!photonView.isMine)
         {
@@ -34,6 +34,18 @@ public class PartyJoiner : Photon.MonoBehaviour
         inviteButton.interactable = false;
         joinButton.SetActive(false);
         leaveButton.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        AgoraVideoChat.PlayerChatIsEmpty += DisableLeaveButton;
+        AgoraVideoChat.PlayerChatIsPopulated += EnableLeaveButton;
+    }
+
+    private void OnDisable()
+    {
+        AgoraVideoChat.PlayerChatIsEmpty -= DisableLeaveButton;
+        AgoraVideoChat.PlayerChatIsPopulated -= DisableLeaveButton;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -66,7 +78,7 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void OnInviteButtonPress()
     {
-        PhotonView.Find(remotePlayerViewID).RPC("InvitePlayerToPartyChannel", PhotonTargets.All, remotePlayerViewID, agoraVideo.GetLocalChannel());
+        PhotonView.Find(remotePlayerViewID).RPC("InvitePlayerToPartyChannel", PhotonTargets.All, remotePlayerViewID, agoraVideo.GetCurrentChannel());
     }
 
     public void OnJoinButtonPress()
@@ -87,7 +99,18 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void EnableLeaveButton()
     {
-        leaveButton.SetActive(true);
+        if(photonView.isMine)
+        {
+            leaveButton.SetActive(true);
+        }
+    }
+
+    private void DisableLeaveButton()
+    {
+        if(photonView.isMine)
+        {
+            leaveButton.SetActive(false);
+        }
     }
 
     [PunRPC]
