@@ -58,12 +58,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     public string GetCurrentChannel() => channel;
 
-
-
-    /// <summary>
-    /// Join the Agora video chat channel of another player.
-    /// </summary>
-    /// <param name="remoteChannelName"></param>
     public void JoinRemoteChannel(string remoteChannelName)
     {
         if (!photonView.isMine)
