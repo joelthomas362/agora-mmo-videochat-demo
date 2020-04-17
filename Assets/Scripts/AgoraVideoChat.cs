@@ -81,9 +81,13 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         currentUserCount = 0;
 
-        if(originalChannel == channel)
+        if(channel == originalChannel)
         {
             channel = myUID.ToString();
+        }
+        else if(channel == myUID.ToString())
+        {
+            channel = originalChannel;
         }
 
         JoinRemoteChannel(channel);
