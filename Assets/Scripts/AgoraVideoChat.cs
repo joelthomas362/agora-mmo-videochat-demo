@@ -9,9 +9,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     private string appID = "57481146914f4cddaa220d6f7a045063";
     [SerializeField]
     private string channel = "unity3d";
-    private string originalChannel;
+    public string originalChannel;
     private IRtcEngine mRtcEngine;
-    private uint myUID = 0;
+    public uint myUID = 0;
     private int currentUserCount = 0;
 
     [Header("Player Video Panel Properties")]
@@ -81,7 +81,12 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         currentUserCount = 0;
 
-        if(channel == originalChannel)
+        print("old channel: " + channel);
+        if(channel != originalChannel)
+        {
+            channel = originalChannel;
+        }
+        else if(channel == originalChannel)
         {
             channel = myUID.ToString();
         }
@@ -89,6 +94,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         {
             channel = originalChannel;
         }
+        print("new channel: " + channel);
 
         JoinRemoteChannel(channel);
     }
