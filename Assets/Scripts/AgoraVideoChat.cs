@@ -230,6 +230,15 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         Vector2 oldContent = content.sizeDelta;
         content.sizeDelta = oldContent + Vector2.down * 150;
         content.anchoredPosition = Vector2.zero;
+
+        if (playerVideoList.Count > 1)
+        {
+            PlayerChatIsPopulated();
+        }
+        else
+        {
+            PlayerChatIsEmpty();
+        }
     }
 
     private void UpdatePlayerVideoPostions()
