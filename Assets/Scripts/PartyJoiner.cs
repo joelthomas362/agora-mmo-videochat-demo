@@ -15,7 +15,7 @@ public class PartyJoiner : Photon.MonoBehaviour
     [SerializeField]
     private int remotePlayerViewID;
     [SerializeField]
-    private string remoteInviteChannelName;
+    private string remoteInviteChannelName = null;
 
     private AgoraVideoChat agoraVideo;
 
@@ -43,14 +43,23 @@ public class PartyJoiner : Photon.MonoBehaviour
             return;
         }
 
-        PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
-        if(otherPlayerPhotonView == null)
+        // Used to join other players Agora video chat.
+        AgoraVideoChat otherPlayerAgora = other.GetComponent<AgoraVideoChat>();
+        if(otherPlayerAgora)
         {
-            return;
+            if(agoraVideo.GetLocalChannel() != otherPlayerAgora.GetLocalChannel())
+            {
+                remoteInviteChannelName = otherPlayerAgora.GetLocalChannel();
+                inviteButton.interactable = true;
+            }
         }
 
-        remotePlayerViewID = otherPlayerPhotonView.viewID;
-        inviteButton.interactable = true;
+        // Used for calling RPC events on other players.
+        PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
+        if (otherPlayerPhotonView != null)
+        {
+            remotePlayerViewID = otherPlayerPhotonView.viewID;
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -60,8 +69,7 @@ public class PartyJoiner : Photon.MonoBehaviour
             return;
         }
 
-        remotePlayerViewID = -1;    
-
+        remoteInviteChannelName = null;    
         inviteButton.interactable = false;
         joinButton.SetActive(false);
     }
@@ -73,7 +81,7 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void OnJoinButtonPress()
     {
-        if (remotePlayerViewID != -1 && photonView.isMine)
+        if (remoteInviteChannelName != null && photonView.isMine)
         {
             agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
             joinButton.SetActive(false);

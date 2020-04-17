@@ -36,6 +36,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
+        // Setup Agora Engine and Callbacks.
         if(mRtcEngine != null)
         {
             IRtcEngine.Destroy();
@@ -58,6 +59,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     public string GetLocalChannel() => channel;
 
+    /// <summary>
+    /// Join the Agora video chat channel of another player.
+    /// </summary>
+    /// <param name="remoteChannelName"></param>
     public void JoinRemoteChannel(string remoteChannelName)
     {
         if (!photonView.isMine)
@@ -72,16 +77,19 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         channel = remoteChannelName;
     }
 
+    /// <summary>
+    /// Resets player Agora video chat party, and joins their original channel.
+    /// </summary>
     public void JoinOriginalChannel()
     {
         if (!photonView.isMine)
             return;
 
-        for(int i = 0; i < playerVideoList.Count; i++)
+        foreach (GameObject player in playerVideoList)
         {
-            Destroy(playerVideoList[i]);
-            playerVideoList.RemoveAt(i);
+            Destroy(player.gameObject);
         }
+        playerVideoList.Clear();
         currentUserCount = 0;
 
         JoinRemoteChannel(originalChannel);
@@ -96,7 +104,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         myUID = uid;
 
-        CreateUserVideoSurface(uid, true); 
+
+        CreateUserVideoSurface(uid, true);
+        print("Local join success");
     }
 
     // Remote Client Joins Channel.
@@ -107,6 +117,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         CreateUserVideoSurface(uid, false);
         GetComponent<PartyJoiner>().EnableLeaveButton();
+        print("Remote join success");
     }
 
     // User Leaves Channel.
@@ -135,15 +146,25 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         float spawnY = currentUserCount * spaceBetweenUserVideos;
         Vector3 spawnPosition = new Vector3(0, -spawnY, 0);
 
+        for (int i = 0; i < playerVideoList.Count; i++)
+        {
+            if(playerVideoList[i].name == uid.ToString())
+            {
+                print("Found duplicate UID: " + uid.ToString());
+                return;
+            }
+        }
+
         // Create Gameobject holding video surface
         GameObject newUserVideo = Instantiate(userVideoPrefab, spawnPosition, spawnPoint.rotation);
-        newUserVideo.name = uid.ToString();
-        if(newUserVideo == null)
+        if (newUserVideo == null)
         {
             Debug.LogError("CreateUserVideoSurface() - newUserVideoIsNull");
             return;
         }
-
+        newUserVideo.name = uid.ToString();
+        newUserVideo.transform.SetParent(spawnPoint, false);
+        newUserVideo.transform.rotation = Quaternion.Euler(Vector3.right * -180);
         playerVideoList.Add(newUserVideo);
 
         // Update our VideoSurface to reflect new users
@@ -161,10 +182,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         // Update our "Content" container that holds all the image planes
         content.sizeDelta = new Vector2(0, currentUserCount * spaceBetweenUserVideos + 140);
 
-        newUserVideo.transform.SetParent(spawnPoint, false);
-        newUserVideo.transform.rotation = Quaternion.Euler(Vector3.right * -180);
+        currentUserCount++;
 
-        currentUserCount++;        
+        UpdatePlayerVideoPostions();
     }
 
     void RemoveUserVideoSurface(uint deletedUID)
@@ -184,16 +204,21 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         }
 
         // update positions of new players
+        UpdatePlayerVideoPostions();
+
+        Vector2 oldContent = content.sizeDelta;
+        content.sizeDelta = oldContent + Vector2.down * 150;
+        content.anchoredPosition = Vector2.zero;
+    }
+
+    private void UpdatePlayerVideoPostions()
+    {
         for (int i = 0; i < playerVideoList.Count; i++)
         {
             print(i + " old position: " + playerVideoList[i].GetComponent<RectTransform>().anchoredPosition);
             playerVideoList[i].GetComponent<RectTransform>().anchoredPosition = Vector2.down * 150 * i;
             print(i + " new position: " + playerVideoList[i].GetComponent<RectTransform>().anchoredPosition);
         }
-
-        Vector2 oldContent = content.sizeDelta;
-        content.sizeDelta = oldContent + Vector2.down * 150;
-        content.anchoredPosition = Vector2.zero;
     }
 
     private void OnApplicationQuit()
