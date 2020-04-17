@@ -87,6 +87,11 @@ public class PartyJoiner : Photon.MonoBehaviour
         leaveButton.SetActive(false);
     }
 
+    public void EnableLeaveButton()
+    {
+        leaveButton.SetActive(true);
+    }
+
     [PunRPC]
     public void InvitePlayerToPartyChannel(int invitedID, string channelName)
     {

@@ -77,11 +77,13 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        mRtcEngine.LeaveChannel();
-        mRtcEngine.JoinChannel(originalChannel, null, myUID);
-        mRtcEngine.EnableVideo();
-        mRtcEngine.EnableVideoObserver();
-        channel = originalChannel;
+        for(int i = 0; i < playerVideoList.Count; i++)
+        {
+            Destroy(playerVideoList[i]);
+            playerVideoList.RemoveAt(i);
+        }
+
+        JoinRemoteChannel(originalChannel);
     }
 
     #region Agora Callbacks
@@ -103,6 +105,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             return;
 
         CreateUserVideoSurface(uid, false);
+        GetComponent<PartyJoiner>().EnableLeaveButton();
     }
 
     // User Leaves Channel.
