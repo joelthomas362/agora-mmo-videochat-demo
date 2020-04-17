@@ -30,6 +30,13 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     public static event AgoraCustomEvent PlayerChatIsEmpty;
     public static event AgoraCustomEvent PlayerChatIsPopulated;
 
+
+
+    // when someone joins my channel, their channel becomes mine
+    // when I leave to go to my original channel, my "original" channel is the one they are still in!
+
+
+
     void Start()
     {
         if (!photonView.isMine)
@@ -93,11 +100,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         myUID = uid;
 
-        if (playerVideoList.Count <= 1)
-        {
-            PlayerChatIsEmpty();
-        }
-
         CreateUserVideoSurface(uid, true);
     }
 
@@ -123,6 +125,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         }
         playerVideoList.Clear();
 
+        if (playerVideoList.Count <= 1)
+        {
+            PlayerChatIsEmpty();
+        }
+
         currentUserCount--;
     }
 
@@ -131,6 +138,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     {
         if (!photonView.isMine)
             return;
+
+        if (playerVideoList.Count <= 1)
+        {
+            PlayerChatIsEmpty();
+        }
 
         RemoveUserVideoSurface(uid);
     }
