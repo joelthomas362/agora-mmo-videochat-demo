@@ -110,7 +110,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             return;
 
         CreateUserVideoSurface(uid, false);
-        PlayerChatIsPopulated();
+        //PlayerChatIsPopulated();
     }
 
     // Local user leaves channel.
@@ -127,7 +127,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         if (playerVideoList.Count <= 1)
         {
-            PlayerChatIsEmpty();
+            //PlayerChatIsEmpty();
         }
 
         currentUserCount--;
