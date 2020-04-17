@@ -92,11 +92,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         myUID = uid;
 
-        if (playerVideoList.Count <= 1)
-        {
-            PlayerChatIsEmpty();
-        }
-
         CreateUserVideoSurface(uid, true);
     }
 
@@ -107,7 +102,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             return;
 
         CreateUserVideoSurface(uid, false);
-        //PlayerChatIsPopulated();
     }
 
     // Local user leaves channel.
@@ -121,11 +115,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             Destroy(player.gameObject);
         }
         playerVideoList.Clear();
-
-        if (playerVideoList.Count <= 1)
-        {
-            //PlayerChatIsEmpty();
-        }
 
         currentUserCount--;
     }
@@ -193,6 +182,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         currentUserCount++;
 
         UpdatePlayerVideoPostions();
+        if (playerVideoList.Count <= 1)
+        {
+            PlayerChatIsEmpty();
+        }
     }
 
     private void RemoveUserVideoSurface(uint deletedUID)
