@@ -198,14 +198,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         currentUserCount++;
 
         UpdatePlayerVideoPostions();
-        //if (playerVideoList.Count > 1)
-        //{
-        //    PlayerChatIsPopulated();
-        //}
-        //else
-        //{
-        //    PlayerChatIsEmpty();
-        //}
+        UpdateLeavePartyButtonState();
     }
 
     private void RemoveUserVideoSurface(uint deletedUID)
@@ -231,14 +224,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         content.sizeDelta = oldContent + Vector2.down * 150;
         content.anchoredPosition = Vector2.zero;
 
-        if (playerVideoList.Count > 1)
-        {
-            PlayerChatIsPopulated();
-        }
-        else
-        {
-            PlayerChatIsEmpty();
-        }
+        UpdateLeavePartyButtonState();
     }
 
     private void UpdatePlayerVideoPostions()
@@ -246,6 +232,18 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         for (int i = 0; i < playerVideoList.Count; i++)
         {
             playerVideoList[i].GetComponent<RectTransform>().anchoredPosition = Vector2.down * 150 * i;
+        }
+    }
+
+    private void UpdateLeavePartyButtonState()
+    {
+        if (playerVideoList.Count > 1)
+        {
+            PlayerChatIsPopulated();
+        }
+        else
+        {
+            PlayerChatIsEmpty();
         }
     }
 
