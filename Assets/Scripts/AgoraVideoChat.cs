@@ -14,7 +14,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     private uint myUID = 0;
     private int currentUserCount = 0;
 
-
     [Header("Player Video Panel Properties")]
     [SerializeField]
     public GameObject userVideoPrefab;
@@ -29,13 +28,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     public delegate void AgoraCustomEvent();
     public static event AgoraCustomEvent PlayerChatIsEmpty;
     public static event AgoraCustomEvent PlayerChatIsPopulated;
-
-
-
-    // when someone joins my channel, their channel becomes mine
-    // when I leave to go to my original channel, my "original" channel is the one they are still in!
-
-
 
     void Start()
     {
@@ -99,6 +91,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             return;
 
         myUID = uid;
+
+        if (playerVideoList.Count <= 1)
+        {
+            PlayerChatIsEmpty();
+        }
 
         CreateUserVideoSurface(uid, true);
     }

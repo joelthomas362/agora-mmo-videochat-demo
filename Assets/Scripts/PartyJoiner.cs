@@ -36,17 +36,17 @@ public class PartyJoiner : Photon.MonoBehaviour
         leaveButton.SetActive(false);
     }
 
-    //private void OnEnable()
-    //{
-    //    AgoraVideoChat.PlayerChatIsEmpty += DisableLeaveButton;
-    //    AgoraVideoChat.PlayerChatIsPopulated += EnableLeaveButton;
-    //}
+    private void OnEnable()
+    {
+        AgoraVideoChat.PlayerChatIsEmpty += DisableLeaveButton;
+        AgoraVideoChat.PlayerChatIsPopulated += EnableLeaveButton;
+    }
 
-    //private void OnDisable()
-    //{
-    //    AgoraVideoChat.PlayerChatIsEmpty -= DisableLeaveButton;
-    //    AgoraVideoChat.PlayerChatIsPopulated -= DisableLeaveButton;
-    //}
+    private void OnDisable()
+    {
+        AgoraVideoChat.PlayerChatIsEmpty -= DisableLeaveButton;
+        AgoraVideoChat.PlayerChatIsPopulated -= DisableLeaveButton;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
