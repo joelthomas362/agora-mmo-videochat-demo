@@ -9,10 +9,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     private string appID = "57481146914f4cddaa220d6f7a045063";
     [SerializeField]
     private string channel = "unity3d";
-    public string originalChannel;
+    private string originalChannel;
     private IRtcEngine mRtcEngine;
-    public uint myUID = 0;
-    private int currentUserCount = 0;
+    private uint myUID = 0;
+    //private int currentUserCount = 0;
 
     [Header("Player Video Panel Properties")]
     [SerializeField]
@@ -79,10 +79,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if (!photonView.isMine)
             return;
 
-        currentUserCount = 0;
+        //currentUserCount = 0;
 
-        print("old channel: " + channel);
-        if(channel != originalChannel)
+        //print("old channel: " + channel);
+        if(channel != originalChannel || channel == myUID.ToString())
         {
             channel = originalChannel;
         }
@@ -90,11 +90,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         {
             channel = myUID.ToString();
         }
-        else if(channel == myUID.ToString())
-        {
-            channel = originalChannel;
-        }
-        print("new channel: " + channel);
+        //print("new channel: " + channel);
 
         JoinRemoteChannel(channel);
     }
@@ -132,7 +128,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         }
         playerVideoList.Clear();
 
-        currentUserCount--;
+       // currentUserCount--;
     }
 
     // Remote User Leaves the Channel.
@@ -163,7 +159,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         }
 
         // Get the next position for newly created VideoSurface
-        float spawnY = currentUserCount * spaceBetweenUserVideos;
+        float spawnY = playerVideoList.Count * spaceBetweenUserVideos;
         Vector3 spawnPosition = new Vector3(0, -spawnY, 0);
 
         // Create Gameobject holding video surface and update properties
@@ -193,9 +189,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         newVideoSurface.SetGameFps(30);
 
         // Update our "Content" container that holds all the image planes
-        content.sizeDelta = new Vector2(0, currentUserCount * spaceBetweenUserVideos + 140);
+        content.sizeDelta = new Vector2(0, playerVideoList.Count * spaceBetweenUserVideos + 140);
 
-        currentUserCount++;
+        //currentUserCount++;
 
         UpdatePlayerVideoPostions();
         UpdateLeavePartyButtonState();
@@ -203,7 +199,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     private void RemoveUserVideoSurface(uint deletedUID)
     {
-        currentUserCount--;
+        //currentUserCount--;
 
         foreach (GameObject player in playerVideoList)
         {
@@ -249,7 +245,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        currentUserCount--;
+        //currentUserCount--;
         if(mRtcEngine != null)
         {
             mRtcEngine.LeaveChannel();

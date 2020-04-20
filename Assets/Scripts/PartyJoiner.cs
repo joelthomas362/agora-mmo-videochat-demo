@@ -83,7 +83,7 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void OnJoinButtonPress()
     {
-        if (remoteInviteChannelName != null && photonView.isMine)
+        if (photonView.isMine && remoteInviteChannelName != null)
         {
             agoraVideo.JoinRemoteChannel(remoteInviteChannelName);
             joinButton.SetActive(false);
@@ -100,7 +100,7 @@ public class PartyJoiner : Photon.MonoBehaviour
         }
     }
 
-    public void EnableLeaveButton()
+    private void EnableLeaveButton()
     {
         if(photonView.isMine)
         {
@@ -119,19 +119,10 @@ public class PartyJoiner : Photon.MonoBehaviour
     [PunRPC]
     public void InvitePlayerToPartyChannel(int invitedID, string channelName)
     {
-        if (invitedID == photonView.viewID && photonView.isMine)
+        if (photonView.isMine && invitedID == photonView.viewID)
         {
             joinButton.SetActive(true);
             remoteInviteChannelName = channelName;
-        }
-    }
-
-    [PunRPC]
-    public void WithdrawInvite(int canceledID)
-    {
-        if(canceledID == photonView.viewID && photonView.isMine)
-        {
-            joinButton.SetActive(false);
         }
     }
 }
