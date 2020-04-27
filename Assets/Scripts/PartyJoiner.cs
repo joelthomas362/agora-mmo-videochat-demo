@@ -1,6 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/* NOTE: 
+ *
+ * This script handles the Photon Network functionality, and the UI required to access player parties:
+ * - 
+ * - 
+ * - 
+ *
+ */
+
 public class PartyJoiner : Photon.MonoBehaviour
 {
     [Header("Local Player Stats")]
@@ -28,6 +37,7 @@ public class PartyJoiner : Photon.MonoBehaviour
     {
         if(!photonView.isMine)
         {
+            // Disable the Canvas of remote users - If we didn't, everyone's canvas would render to all screens.
             transform.GetChild(0).gameObject.SetActive(false);
         }
 
@@ -55,7 +65,7 @@ public class PartyJoiner : Photon.MonoBehaviour
             return;
         }
 
-        // Used for calling RPC events on other players.
+        // Get a reference to the player that we are standing next to in our Trigger Volume.
         PhotonView otherPlayerPhotonView = other.GetComponent<PhotonView>();
         if (otherPlayerPhotonView != null)
         {
@@ -71,6 +81,7 @@ public class PartyJoiner : Photon.MonoBehaviour
             return;
         }
 
+        // Remove that player reference when they walk away.
         remoteInviteChannelName = null;    
         inviteButton.interactable = false;
         joinButton.SetActive(false);
@@ -78,7 +89,19 @@ public class PartyJoiner : Photon.MonoBehaviour
 
     public void OnInviteButtonPress()
     {
+        // Sends out a ping across the Photon network to check if any players have this "Invite" function attached.
         PhotonView.Find(remotePlayerViewID).RPC("InvitePlayerToPartyChannel", PhotonTargets.All, remotePlayerViewID, agoraVideo.GetCurrentChannel());
+    }
+
+    [PunRPC]
+    public void InvitePlayerToPartyChannel(int invitedID, string channelName)
+    {
+        // When the invited ID matches the correct player ID, update their canvas and tell them what Agora channel to join.
+        if (photonView.isMine && invitedID == photonView.viewID)
+        {
+            joinButton.SetActive(true);
+            remoteInviteChannelName = channelName;
+        }
     }
 
     public void OnJoinButtonPress()
@@ -113,16 +136,6 @@ public class PartyJoiner : Photon.MonoBehaviour
         if(photonView.isMine)
         {
             leaveButton.SetActive(false);
-        }
-    }
-
-    [PunRPC]
-    public void InvitePlayerToPartyChannel(int invitedID, string channelName)
-    {
-        if (photonView.isMine && invitedID == photonView.viewID)
-        {
-            joinButton.SetActive(true);
-            remoteInviteChannelName = channelName;
         }
     }
 }

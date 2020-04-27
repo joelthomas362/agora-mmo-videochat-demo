@@ -2,6 +2,19 @@
 using UnityEngine; 
 using agora_gaming_rtc;
 
+
+
+/* NOTE: 
+ *
+ * This script handles the Agora-related functionality:
+ * - Joining / Leaving Channels
+ * - Creating / Deleting VideoSurface objects that enable us to see the camera feed of Agora party chat
+ * - Managing the UI that contains the VideoSurface objects 
+ *
+ */
+
+
+
 public class AgoraVideoChat : Photon.MonoBehaviour
 {
     [Header("Agora Properties")]
@@ -32,8 +45,6 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     {
         if (!photonView.isMine)
         {
-            // Disable the Canvas of remote users.
-            transform.GetChild(0).gameObject.SetActive(false);
             return;
         }
             
@@ -48,16 +59,21 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
         originalChannel = channel;
 
+        // -- These are all necessary steps to initialize the Agora engine -- //
+        // Initialize Agora engine
         mRtcEngine = IRtcEngine.GetEngine(appID);
 
+        // Setup our callbacks (there are many other Agora callbacks, however these are the calls we need).
         mRtcEngine.OnJoinChannelSuccess = OnJoinChannelSuccessHandler;
         mRtcEngine.OnUserJoined = OnUserJoinedHandler;
         mRtcEngine.OnLeaveChannel = OnLeaveChannelHandler;
         mRtcEngine.OnUserOffline = OnUserOfflineHandler;
 
+        // Your video feed will not render if EnableVideo() isn't called. 
         mRtcEngine.EnableVideo();
         mRtcEngine.EnableVideoObserver();
 
+        // By setting our UID to "0" the Agora Engine creates a new one and assigns it. 
         mRtcEngine.JoinChannel(channel, null, 0);
     }
 
@@ -66,7 +82,9 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     public void JoinRemoteChannel(string remoteChannelName)
     {
         if (!photonView.isMine)
+        {
             return;
+        } 
 
         mRtcEngine.LeaveChannel();
 
@@ -83,8 +101,16 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     public void JoinOriginalChannel()
     {
         if (!photonView.isMine)
+        {
             return;
+        }
 
+
+        /* NOTE:
+         * Say I'm in my original channel - "myChannel" - and someone joins me.
+         * If I want to leave the party, and go back to my original channel, someone is already in it!
+         * Therefore, if someone is inside "myChannel" and I want to be alone, I have to join a new channel that has the name of my unique Agora UID "304598093" (for example).
+         */
         if(channel != originalChannel || channel == myUID.ToString())
         {
             channel = originalChannel;
@@ -146,10 +172,10 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     }
     #endregion
 
-    // Create new image plane to display users in party
+    // Create new image plane to display users in party.
     private void CreateUserVideoSurface(uint uid, bool isLocalUser)
     {
-        // Avoid duplicating Local player video screen
+        // Avoid duplicating Local player VideoSurface image plane.
         for (int i = 0; i < playerVideoList.Count; i++)
         {
             if (playerVideoList[i].name == uid.ToString())
@@ -158,11 +184,11 @@ public class AgoraVideoChat : Photon.MonoBehaviour
             }
         }
 
-        // Get the next position for newly created VideoSurface
+        // Get the next position for newly created VideoSurface to place inside UI Container.
         float spawnY = playerVideoList.Count * spaceBetweenUserVideos;
         Vector3 spawnPosition = new Vector3(0, -spawnY, 0);
 
-        // Create Gameobject holding video surface and update properties
+        // Create Gameobject that will serve as our VideoSurface.
         GameObject newUserVideo = Instantiate(userVideoPrefab, spawnPosition, spawnPoint.rotation);
         if (newUserVideo == null)
         {
@@ -238,6 +264,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         }
     }
 
+    // Cleaning up the Agora engine during OnApplicationQuit() is an essential part of the Agora process with Unity. 
     private void OnApplicationQuit()
     {
         if(mRtcEngine != null)
