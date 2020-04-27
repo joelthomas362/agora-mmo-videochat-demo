@@ -15,7 +15,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
 
     [Header("Player Video Panel Properties")]
     [SerializeField]
-    public GameObject userVideoPrefab;
+    private GameObject userVideoPrefab;
     [SerializeField]
     private Transform spawnPoint;
     [SerializeField]
@@ -31,7 +31,12 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     void Start()
     {
         if (!photonView.isMine)
+        {
+            // Disable the Canvas of remote users.
+            transform.GetChild(0).gameObject.SetActive(false);
             return;
+        }
+            
 
         playerVideoList = new List<GameObject>();
 
@@ -175,6 +180,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         if(newVideoSurface == null)
         {
             Debug.LogError("CreateUserVideoSurface() - VideoSurface component is null on newly joined user");
+            return;
         }
 
         if (isLocalUser == false)
@@ -183,7 +189,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         }
         newVideoSurface.SetGameFps(30);
 
-        // Update our "Content" container that holds all the image planes
+        // Update our "Content" container that holds all the newUserVideo image planes
         content.sizeDelta = new Vector2(0, playerVideoList.Count * spaceBetweenUserVideos + 140);
 
         UpdatePlayerVideoPostions();
@@ -196,9 +202,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
         {
             if (player.name == deletedUID.ToString())
             {
-                // remove videoview from list
                 playerVideoList.Remove(player);
-                // delete it
                 Destroy(player.gameObject);
                 break;
             }
@@ -218,7 +222,7 @@ public class AgoraVideoChat : Photon.MonoBehaviour
     {
         for (int i = 0; i < playerVideoList.Count; i++)
         {
-            playerVideoList[i].GetComponent<RectTransform>().anchoredPosition = Vector2.down * 150 * i;
+            playerVideoList[i].GetComponent<RectTransform>().anchoredPosition = Vector2.down * spaceBetweenUserVideos * i;
         }
     }
 
